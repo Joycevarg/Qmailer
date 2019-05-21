@@ -1,5 +1,7 @@
 package com.example.qmailer;
 
+import android.os.AsyncTask;
+import android.support.v4.app.INotificationSideChannel;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -21,15 +23,25 @@ import java.util.Properties;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 
+import static java.lang.Thread.sleep;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
 
-    Subscriber subs,s;
+    Subscriber subs;
     question qu;
     ArrayList<question> questions;
     FirebaseDatabase database;
     DatabaseReference DBRef;
     DatabaseReference subRef,qRef;
+
+
+
+
+
+
+
+
 
     private Button buttonSend;
     ValueEventListener subscriberListener = new ValueEventListener() {
@@ -37,17 +49,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         public void onDataChange(DataSnapshot dataSnapshot) {
 
 
-            for (DataSnapshot sub:dataSnapshot.getChildren()) {
 
-                subs=sub.getValue(Subscriber.class);
-                String key=sub.getKey();
+            for (final DataSnapshot s : dataSnapshot.getChildren()) {
+//
 
-                sendEmail(subs);
+                        subs = s.getValue(Subscriber.class);
+                        String key = s.getKey();
+                        sendEmail(subs);
+                        subRef.child(key).child("question").setValue(subs.getQuestion()+1);
+                    }
 
 
-                subRef.child(key).child("question").setValue(subs.getQuestion()+1);
-            }
-            // ...
         }
 
         @Override

@@ -39,18 +39,18 @@ public class SendMail extends AsyncTask<Void,Void,Void> {
         this.message = message;
     }
 
-    @Override
-    protected void onPreExecute() {
-        super.onPreExecute();
-
-        progressDialog = ProgressDialog.show(context,"Sending message","Please wait...",false,false);
-    }
+//    @Override
+//    protected void onPreExecute() {
+//        super.onPreExecute();
+//
+//        progressDialog = ProgressDialog.show(context,"Sending message","Please wait...",false,false);
+//    }
 
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
 
-        progressDialog.dismiss();
+//        progressDialog.dismiss();
 
         Toast.makeText(context,"Message Sent",Toast.LENGTH_LONG).show();
     }
