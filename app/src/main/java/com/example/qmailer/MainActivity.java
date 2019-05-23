@@ -79,18 +79,29 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        findViewById(R.id.buttonStop).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                    suspendEmailServices();
+            }
+        });
 
     }
 
 
+    private void suspendEmailServices()
+    {
+        AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
+        //creating a new intent specifying the broadcast receiver
+        Intent i = new Intent(this, MyAlarm.class);
 
+        //creating a pending intent using the intent
+        PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, 0);
+        am.cancel(pi);
+        Log.d("Down","Services Cancelled");
 
-
-
-
-
-
+    }
 
 
 
