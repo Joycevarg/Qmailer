@@ -21,39 +21,44 @@ public class DbInteract {
     DatabaseReference subRef,qRef;
     private Context context;
 
-//save the context recievied via constructor in a local variable
 
     public DbInteract(Context context)
     {
         this.context=context;
+        this.addQuestions();
     }
     private void sendEmail(Subscriber s) {
 
+        if(s.getQuestion()<200)
+        {
+        question q=questions.get(s.getQuestion());
         String email = s.getEmail();
         String subject = "Qmailer";
-        question q=questions.get(s.getQuestion());
         String message = "Hi "+ s.getName()+",<br>Here is your question for today<br> <a href=\""+q.getLink()+"\">"+q.getTitle()+"</a>";
         Log.d("Hey",message);
 
-        SendMail sm = new SendMail(context, email, subject, message);
+        SendMail sm = new SendMail(context, email, subject, message,false);
 
-        sm.execute();
+        sm.execute();}
     }
     ValueEventListener subscriberListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
 
-
-
+                NotificationHelper nh=new NotificationHelper();
+                int max= (int) dataSnapshot.getChildrenCount();
+                SendMail.max=max;
+                int count=0;
             for (final DataSnapshot s : dataSnapshot.getChildren()) {
 //
-
+//                nh.sendingNotification(1002,count,max);
+                count++;
                 subs = s.getValue(Subscriber.class);
                 String key = s.getKey();
                 sendEmail(subs);
                 subRef.child(key).child("question").setValue(subs.getQuestion()+1);
             }
-
+//            nh.sendedNotification(1002);
 
         }
 
