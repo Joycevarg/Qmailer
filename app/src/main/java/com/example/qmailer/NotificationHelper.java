@@ -44,13 +44,17 @@ public class NotificationHelper {
     void noInternetNotification(int id)
     {
 
+        Intent i = new Intent(context, MyAlarm.class);
+
+        //creating a pending intent using the intent
+        PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
+
 
         NotificationCompat.Builder notificationBuilder =new NotificationCompat.Builder(context, channelId)
         .setSmallIcon(R.drawable.notification_icon)
         .setContentTitle("No Internet")
         .setContentText("Dont forget to open app and send mail")
-//                .setStyle(new NotificationCompat.BigTextStyle()
-//                        .bigText("Much longer text that cannot fit one line..."))
+         .addAction(R.drawable.notification_icon,"Sent mails",pi)
          .setPriority(NotificationCompat.PRIORITY_DEFAULT)
         .setAutoCancel(true)
                 .setOngoing(true); // 8

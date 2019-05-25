@@ -29,7 +29,7 @@ public class MyAlarm extends BroadcastReceiver {
 
             cm=(ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
             if(cm.getActiveNetworkInfo()==null)
-            {nh.noInternetNotification(1001);
+            {nh.noInternetNotification(1002);
 
                 Log.d("No internet", "Emails not sent");}
             else{
