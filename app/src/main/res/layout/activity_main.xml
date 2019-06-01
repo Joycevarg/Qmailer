@@ -18,7 +18,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
-
+        <TextView
+            android:id="@+id/online"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:textSize="20dp"
+            android:text="online" />
         <Button
             android:id="@+id/buttonAlarm"
             android:layout_width="match_parent"
@@ -30,6 +36,9 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5pt"
             android:text="Send Mails" />
+
+
+
         <Button
             android:id="@+id/buttonStop"
             android:layout_width="match_parent"

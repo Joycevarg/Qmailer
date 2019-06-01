@@ -1,7 +1,9 @@
 package com.example.qmailer;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -9,7 +11,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class DbInteract {
 
@@ -18,17 +22,21 @@ public class DbInteract {
     ArrayList<question> questions;
     FirebaseDatabase database;
     DatabaseReference DBRef;
-    DatabaseReference subRef,qRef;
+    DatabaseReference subRef,qRef,dRef;
     private Context context;
-
+    String date;
 
     public DbInteract(Context context)
     {
         this.context=context;
-        this.addQuestions();
+
+        database = FirebaseDatabase.getInstance();
+        DBRef = database.getReference("/");
+        subRef=DBRef.child("/subscribers");
+        qRef=DBRef.child("/questions");
+        dRef=DBRef.child("/senddates");
     }
     private void sendEmail(Subscriber s) {
-
         if(s.getQuestion()<200)
         {
         question q=questions.get(s.getQuestion());
@@ -91,22 +99,55 @@ public class DbInteract {
             // ...
         }
     };
+    ValueEventListener dateListener=new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            // This method is called once with the initial value and again
+            // whenever data at this location is updated.
+            boolean value;
+            if(dataSnapshot.exists())
+                value = dataSnapshot.getValue(boolean.class);
+
+            else
+                value=false;
+
+            if(!value){
+                setDate(date,false);
+                addQuestions();
+                subRef.addListenerForSingleValueEvent(subscriberListener);
+            }
+            else
+                Toast.makeText(context,"Emails for today were already sent",Toast.LENGTH_SHORT).show();
+
+        }
+
+        @Override
+        public void onCancelled(DatabaseError error) {
+            Log.d("Date",error.toString())   ;
+        }
+
+    };
     public void addQuestions(){
 
         questions=new ArrayList<>();
 
-        database = FirebaseDatabase.getInstance();
-        DBRef = database.getReference("/");
-
-        subRef=DBRef.child("/subscribers");
-        qRef=DBRef.child("/questions");
         qRef.addValueEventListener(questionListener);
 
     }
 
+    public void setDate(String date,boolean val)
+    {
+
+        dRef.child(date).setValue(val);
+    }
+
+
     public void sendMails()
     {
-        subRef.addListenerForSingleValueEvent(subscriberListener);
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat mdformat = new SimpleDateFormat("yyyy/MM/dd");
+        date=mdformat.format(calendar.getTime());
+       dRef.child(date).addListenerForSingleValueEvent(dateListener);
     }
 
 

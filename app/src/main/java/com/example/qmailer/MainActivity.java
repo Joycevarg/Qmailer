@@ -4,49 +4,86 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
 
-    //the timepicker object
     TimePicker timePicker;
     Context context;
+    TextView Online;
+    SharedPreferences sharedPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
         context=this;
 
-        //getting the timepicker object
+
+        sharedPref = MainActivity.this.getSharedPreferences("Qmailer",Context.MODE_PRIVATE);
+        final SharedPreferences.Editor editor = sharedPref.edit();
+        boolean isOnline =sharedPref.getBoolean("Online", false);
+        Online=findViewById(R.id.online);
         timePicker =  findViewById(R.id.timePicker);
+        if(isOnline)
+        {
+            int hour=sharedPref.getInt("Hour", 0);
+            int minute=sharedPref.getInt("Minute", 0);
+            Online.setText("Active");
+            Online.setTextColor(Color.GREEN);
+            if (android.os.Build.VERSION.SDK_INT >= 23) {
+               timePicker.setHour(hour);
+               timePicker.setMinute(minute);
+            } else {
+               timePicker.setCurrentHour(minute);
+               timePicker.setCurrentMinute(minute);
+
+            }
+        }
+        else
+        {
+            Online.setText("Inactive");
+            Online.setTextColor(Color.RED);
+        }
 
         //attaching clicklistener on button
         findViewById(R.id.buttonAlarm).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //We need a calendar object to get the specified time in millis
-                //as the alarm manager method takes time in millis to setup the alarm
 
                 Calendar calendar = Calendar.getInstance();
                 if (android.os.Build.VERSION.SDK_INT >= 23) {
                     calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH),
                             timePicker.getHour(), timePicker.getMinute(), 0);
+                    editor.putInt("Hour", timePicker.getHour());
+                    editor.putInt("Minute", timePicker.getMinute());
                 } else {
                     calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH),
                             timePicker.getCurrentHour(), timePicker.getCurrentMinute(), 0);
+                    editor.putInt("Hour", timePicker.getCurrentHour());
+                    editor.putInt("Minute", timePicker.getCurrentMinute());
                 }
-
-
+                editor.putBoolean("Online",true);
+                editor.putLong("Time",calendar.getTimeInMillis());
+                Online.setText("Active");
+                Online.setTextColor(Color.GREEN);
+                editor.commit();
                 setTime(calendar.getTimeInMillis());
             }
         });
@@ -58,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
                 //We need a calendar object to get the specified time in millis
                 //as the alarm manager method takes time in millis to setup the alarm
 
+                Toast.makeText(context, "Qmailer starting", Toast.LENGTH_SHORT).show();
                 Log.d("Lets", "start sending emails");
                 SendMail.count=0;
                 NotificationHelper.createNotificationChannel(context,
@@ -72,9 +110,12 @@ public class MainActivity extends AppCompatActivity {
 
                     Log.d("No internet", "Emails not sent");}
                 else{
-                    DbInteract db = new DbInteract(context);
+                    DbInteract db;
+                    Calendar calendar = Calendar.getInstance();
+                    SimpleDateFormat mdformat = new SimpleDateFormat("yyyy/MM/dd");
+                    db = new DbInteract(context);
                     db.sendMails();
-                    nh.sendedNotification(1002);
+                    cm=null;
                 }
             }
         });
@@ -82,7 +123,11 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.buttonStop).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                    suspendEmailServices();
+                suspendEmailServices();
+                editor.putBoolean("Online",false);
+                Online.setText("Inactive");
+                Online.setTextColor(Color.RED);
+                editor.commit();
             }
         });
 
@@ -100,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
         PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, 0);
         am.cancel(pi);
         Log.d("Down","Services Cancelled");
-
+        Toast.makeText(this, "Qmailer suspended", Toast.LENGTH_SHORT).show();
     }
 
 
@@ -116,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
         PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, 0);
 
         //setting the repeating alarm that will be fired every day
-        am.setRepeating(AlarmManager.RTC, time, 3*60*1000, pi);
-        Toast.makeText(this, "Alarm is set", Toast.LENGTH_SHORT).show();
+        am.setRepeating(AlarmManager.RTC, time, AlarmManager.INTERVAL_DAY/3, pi);
+        Toast.makeText(this, "Qmailer running", Toast.LENGTH_SHORT).show();
     }
 }

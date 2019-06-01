@@ -7,7 +7,6 @@ import android.net.ConnectivityManager;
 import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 
-
 //class extending the Broadcast Receiver
 public class MyAlarm extends BroadcastReceiver {
 
@@ -33,10 +32,9 @@ public class MyAlarm extends BroadcastReceiver {
 
                 Log.d("No internet", "Emails not sent");}
             else{
-            db = new DbInteract(context);
-            db.sendMails();
-            cm=null;
-            Log.d("Successfully", "Emails sent");
+                db = new DbInteract(context);
+                db.sendMails();
+                cm=null;
             }
 
     }

@@ -51,12 +51,14 @@ public class SendMail extends AsyncTask<Void,Void,Void> {
 //        progressDialog = ProgressDialog.show(context,"Sending message","Please wait...",false,false);
 //    }
 
-    public void sendCompEmail()
+    public void dateSetandSendCompEmail()
     {
         String email = Config.ADMIN_EMAIL;
         String subject = "Qmailer";
         Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat mdformat = new SimpleDateFormat("yyyy / MM / dd ");
+        SimpleDateFormat mdformat = new SimpleDateFormat("yyyy/MM/dd");
+        DbInteract db=new DbInteract(context);
+        db.setDate(mdformat.format(calendar.getTime()),true);
         String message = "Hi Admin,<br> Today's mails have been sent out.<br>DATED : "+ mdformat.format(calendar.getTime());
         Log.d("Hey",message);
 
@@ -67,9 +69,11 @@ public class SendMail extends AsyncTask<Void,Void,Void> {
 
     public void afterMails()
     {
-        sendCompEmail();
+        dateSetandSendCompEmail();
         nh.sendedNotification(1002);
         Log.d("Successfully", "Emails sent");
+
+        Toast.makeText(context, "Qmailer finished", Toast.LENGTH_SHORT).show();
     }
 
     @Override
