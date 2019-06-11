@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
@@ -31,12 +32,8 @@ public class NotificationHelper {
             channel.setDescription(description);
             channel.setShowBadge(showBadge);
             channel.setSound(null,null);
-
-
             NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
-
-
 
         }
     }
@@ -51,7 +48,8 @@ public class NotificationHelper {
 
 
         NotificationCompat.Builder notificationBuilder =new NotificationCompat.Builder(context, channelId)
-        .setSmallIcon(R.drawable.notification_icon)
+        .setSmallIcon(R.drawable.notif)
+                .setColor(R.drawable.ic_launcher_background)
         .setContentTitle("No Internet")
         .setContentText("Dont forget to open app and send mail")
          .addAction(R.drawable.notification_icon,"Sent mails",pi)
@@ -61,12 +59,21 @@ public class NotificationHelper {
         sendNotification(notificationBuilder,id);
     }
 
+ void notificationcancel(int id)
+ {
+     NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+
+     notificationManager.cancel(id);
+
+ }
+
 
     void sendingNotification(int id,int progress,int max)
     {
 
         NotificationCompat.Builder notificationBuilder =new NotificationCompat.Builder(context, channelId)
-                .setSmallIcon(R.drawable.notification_icon)
+                .setSmallIcon(R.drawable.notif)
+                .setColor(R.drawable.ic_launcher_background)
                 .setContentTitle("We're sending out mails")
                 .setContentText("Do not turn off internet")
 //                .setStyle(new NotificationCompat.BigTextStyle()
@@ -81,7 +88,8 @@ public class NotificationHelper {
     void sendedNotification(int id)
     {
         NotificationCompat.Builder notificationBuilder =new NotificationCompat.Builder(context, channelId)
-                .setSmallIcon(R.drawable.notification_icon)
+                .setSmallIcon(R.drawable.notif)
+                .setColor(R.drawable.ic_launcher_background)
                 .setContentTitle("We've send out mails")
                 .setContentText("You can turn off internet")
 //                .setStyle(new NotificationCompat.BigTextStyle()
@@ -92,6 +100,25 @@ public class NotificationHelper {
                 .setAutoCancel(true); // 8
         sendNotification(notificationBuilder,id);
     }
+
+    void questionNotification(int id)
+    {
+
+        NotificationCompat.Builder notificationBuilder =new NotificationCompat.Builder(context, channelId)
+                .setSmallIcon(R.drawable.notif)
+                .setColor(R.drawable.ic_launcher_background)
+                .setContentTitle("We're getting questions")
+                .setContentText("Do not turn off internet")
+//                .setStyle(new NotificationCompat.BigTextStyle()
+//                        .bigText("Much longer text that cannot fit one line..."))
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setAutoCancel(false)
+                .setOngoing(true)
+                .setOnlyAlertOnce(true)
+                .setProgress(0,0,true);
+        sendNotification(notificationBuilder,id);
+    }
+
 
     private void sendNotification(NotificationCompat.Builder notificationBuilder,int id)
     {

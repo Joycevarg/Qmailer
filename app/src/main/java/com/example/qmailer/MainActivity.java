@@ -89,6 +89,23 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+        findViewById(R.id.Log).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ConnectivityManager cm=(ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+                if(cm.getActiveNetworkInfo()!=null) {
+                    Intent intent = new Intent(MainActivity.this, DateLog.class);
+                    startActivity(intent);
+                }
+                else
+                {
+                    Toast.makeText(context, "No Internet", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+
+
         findViewById(R.id.buttonSend).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -110,12 +127,10 @@ public class MainActivity extends AppCompatActivity {
 
                     Log.d("No internet", "Emails not sent");}
                 else{
+                    nh.notificationcancel(1002);
                     DbInteract db;
-                    Calendar calendar = Calendar.getInstance();
-                    SimpleDateFormat mdformat = new SimpleDateFormat("yyyy/MM/dd");
                     db = new DbInteract(context);
                     db.sendMails();
-                    cm=null;
                 }
             }
         });
@@ -152,6 +167,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void setTime(long time) {
         //getting the alarm manager
+        NotificationHelper nh=new NotificationHelper();
+        nh.notificationcancel(1002);
         AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
         //creating a new intent specifying the broadcast receiver
